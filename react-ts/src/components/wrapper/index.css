@@ -1,0 +1,8 @@
+@import '../../index.css';
+
+.wrapper {
+  width: calc(var(--block-size) * 10);
+  height: calc(var(--block-size) * 20);
+  border: 1px solid black;
+  margin: 200px auto;
+}
