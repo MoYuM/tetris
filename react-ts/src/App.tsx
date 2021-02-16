@@ -67,10 +67,11 @@ const App = () => {
     setMap(temp);
   }
 
+  // 到达底部自动停止
   React.useEffect(() => {
     let isEnd = false;
     currentBlock
-      .filter(item => !currentBlock.includes(item + 10))
+      .filter(item => !currentBlock.includes(item + 10)) // 过滤掉四个方格中下方有方格的方格
       .forEach(item => {
         if (map[item + 10] !== 0) {
           isEnd = true;
@@ -79,6 +80,7 @@ const App = () => {
 
     if (isEnd) {
       clearInterval(time);
+      setCurrentBlock([])
     }
   }, [currentBlock])
 
