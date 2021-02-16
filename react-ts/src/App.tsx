@@ -48,8 +48,16 @@ const App = () => {
     )
   }
 
-  const create_L = () => {
-    const firstBlockIndex = 4;
+  const create = () => {
+    let initIndex = 4;
+    setInterval(() => {
+      create_L(initIndex);
+      initIndex += 10
+    }, 1000);
+  }
+
+  const create_L = (initIndex: number) => {
+    const firstBlockIndex = initIndex;
     const secondBlockIndex = firstBlockIndex + 10;
     const thirdBlockIndex = secondBlockIndex + 10;
     const fourthBlockIndex = thirdBlockIndex + 1;
@@ -67,7 +75,7 @@ const App = () => {
     <div className="App">
       <Wrapper>
         {render()}
-        <button onClick={create_L}>create_L</button>
+        <button onClick={create}>create_L</button>
       </Wrapper>
     </div>
   );
