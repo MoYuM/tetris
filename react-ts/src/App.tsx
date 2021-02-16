@@ -50,24 +50,16 @@ const App = () => {
 
   const create = () => {
     let initIndex = 4;
-    setInterval(() => {
+    const dropdown = setInterval(() => {
       create_L(initIndex);
       initIndex += 10
     }, 1000);
   }
 
   const create_L = (initIndex: number) => {
-    const firstBlockIndex = initIndex;
-    const secondBlockIndex = firstBlockIndex + 10;
-    const thirdBlockIndex = secondBlockIndex + 10;
-    const fourthBlockIndex = thirdBlockIndex + 1;
-    
+    const indexList = [initIndex, initIndex + 10, initIndex + 20, initIndex + 21]
     const temp = JSON.parse(JSON.stringify(map));
-    temp[firstBlockIndex] = 1;
-    temp[secondBlockIndex] = 1;
-    temp[thirdBlockIndex] = 1;
-    temp[fourthBlockIndex] = 1;
-
+    indexList.forEach(i => temp[i] = 1);
     setMap(temp);
   }
 
