@@ -82,22 +82,25 @@ public class Piece : MonoBehaviour
           cell.x += 0.5f;
           cell.y += 0.5f;
 
-          x = (int)((cell.x * Data.RotationMatrix[0] * direction) - (cell.y * Data.RotationMatrix[1] * direction));
-          y = (int)((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
-
-          cells[i] = new Vector3Int(x, y, 0);
+          cells[i] = Rotate90(direction, cell);
 
           break;
 
         default:
-          x = (int)((cell.x * Data.RotationMatrix[0] * direction) - (cell.y * Data.RotationMatrix[1] * direction));
-          y = (int)((cell.x * Data.RotationMatrix[2] * direction) + (cell.y * Data.RotationMatrix[3] * direction));
 
-          cells[i] = new Vector3Int(x, y, 0);
+          cells[i] = Rotate90(direction, cell);
           break;
       }
     }
   }
+
+public Vector3Int Rotate90(int direction, Vector2Int position) 
+{ 
+  int x = -1 * direction * position.y;
+  int y = direction * position.x;
+
+  return new Vector3Int(x, y, 0);
+}
 
   public int Clamp(int min, int max, int num)
   {
