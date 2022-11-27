@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Purchasing;
 
 public class Piece : MonoBehaviour
 {
@@ -73,7 +72,6 @@ public class Piece : MonoBehaviour
     for (int i = 0; i < cells.Length; i++)
     {
       Vector3 cell = cells[i];
-      int x, y;
 
       switch (data.tetromino)
       {
@@ -94,12 +92,12 @@ public class Piece : MonoBehaviour
     }
   }
 
-public Vector3Int Rotate90(int direction, Vector2Int position) 
+public Vector3Int Rotate90(int direction, Vector3 position) 
 { 
-  int x = -1 * direction * position.y;
-  int y = direction * position.x;
+  float x = -1 * direction * position.y;
+  float y = direction * position.x;
 
-  return new Vector3Int(x, y, 0);
+  return new Vector3Int((int)x, (int)y, 0);
 }
 
   public int Clamp(int min, int max, int num)
