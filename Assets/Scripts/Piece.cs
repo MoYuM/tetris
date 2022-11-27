@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -66,9 +67,51 @@ public class Piece : MonoBehaviour
 
     public void Rotate(int direction)
     {
+        int originRotationIndex = rotationIndex;
+
         rotationIndex += direction;
         rotationIndex = Clamp(0, cells.Length, rotationIndex);
 
+        ApplyRotation(direction);
+
+        if (!checkWallkick(rotationIndex, direction)) {
+            ApplyRotation(-direction);
+            rotationIndex = originRotationIndex;
+	    }
+    }
+    
+    public bool checkWallkick(int rotationIndex, int direction)
+    {
+        int wallKickIndex = getWallKickIndex(rotationIndex, direction);
+
+        for(int i = 0; i < data.wallKicks.GetLength(1); i ++)
+        {
+
+            Vector2Int translation = data.wallKicks[wallKickIndex, i];
+	        
+            if (Move(translation)) {
+                return true;
+	        }
+
+	    }
+
+        return false;
+    }
+
+    private int getWallKickIndex(int rotationIndex,int direction)
+    {
+        int wallKickIndex = rotationIndex * 2;
+
+        if (direction < 0) {
+            wallKickIndex--;
+	    }
+
+        return wallKickIndex;
+    }
+
+    public void ApplyRotation(int direction)
+    { 
+        
         for (int i = 0; i < cells.Length; i++)
         {
             Vector3 cell = cells[i];
