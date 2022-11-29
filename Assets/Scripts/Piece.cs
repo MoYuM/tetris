@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -8,6 +7,7 @@ public class Piece : MonoBehaviour
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
     private int rotationIndex = 0;
+    public float stepDelayTime = 1.0f;
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
@@ -62,31 +62,40 @@ public class Piece : MonoBehaviour
             hardDrop();
         }
 
+        stepDelayTime -= Time.deltaTime;
+        if (stepDelayTime < 0)
+        {
+            Step();
+            stepDelayTime = 2f;
+	    }
+
         board.Set(this);
     }
 
     public void Rotate(int direction)
     {
-        int originRotationIndex = rotationIndex;
+        // Store the current rotation in case the rotation fails
+        // and we need to revert
+        int originalRotation = rotationIndex;
 
-        rotationIndex += direction;
-        rotationIndex = Clamp(0, cells.Length, rotationIndex);
-
+        // Rotate all of the cells using a rotation matrix
+        rotationIndex = Clamp(0,4, rotationIndex + direction);
         ApplyRotation(direction);
 
-        if (!checkWallkick(rotationIndex, direction)) {
+        // Revert the rotation if the wall kick tests fail
+        if (!CheckWallkick(rotationIndex, direction))
+        {
+            rotationIndex = originalRotation;
             ApplyRotation(-direction);
-            rotationIndex = originRotationIndex;
-	    }
+        }
     }
     
-    public bool checkWallkick(int rotationIndex, int direction)
+    public bool CheckWallkick(int rotationIndex, int direction)
     {
         int wallKickIndex = getWallKickIndex(rotationIndex, direction);
 
         for(int i = 0; i < data.wallKicks.GetLength(1); i ++)
         {
-
             Vector2Int translation = data.wallKicks[wallKickIndex, i];
 	        
             if (Move(translation)) {
@@ -106,32 +115,39 @@ public class Piece : MonoBehaviour
             wallKickIndex--;
 	    }
 
-        return wallKickIndex;
+        return Clamp(0, data.wallKicks.GetLength(0), wallKickIndex);
     }
 
     public void ApplyRotation(int direction)
-    { 
-        
+    {
+
+        float[] matrix = Data.RotationMatrix;
+
+        // Rotate all of the cells using the rotation matrix
         for (int i = 0; i < cells.Length; i++)
         {
             Vector3 cell = cells[i];
+
+            int x, y;
 
             switch (data.tetromino)
             {
                 case Tetromino.I:
                 case Tetromino.O:
-                    cell.x += 0.5f;
-                    cell.y += 0.5f;
-
-                    cells[i] = Rotate90(direction, cell);
-
+                    // "I" and "O" are rotated from an offset center point
+                    cell.x -= 0.5f;
+                    cell.y -= 0.5f;
+                    x = Mathf.CeilToInt((cell.x * matrix[0] * direction) + (cell.y * matrix[1] * direction));
+                    y = Mathf.CeilToInt((cell.x * matrix[2] * direction) + (cell.y * matrix[3] * direction));
                     break;
 
                 default:
-
-                    cells[i] = Rotate90(direction, cell);
+                    x = Mathf.RoundToInt((cell.x * matrix[0] * direction) + (cell.y * matrix[1] * direction));
+                    y = Mathf.RoundToInt((cell.x * matrix[2] * direction) + (cell.y * matrix[3] * direction));
                     break;
             }
+
+            cells[i] = new Vector3Int(x, y, 0);
         }
     }
 
@@ -143,19 +159,21 @@ public class Piece : MonoBehaviour
         return new Vector3Int((int)x, (int)y, 0);
     }
 
+    public void Step()
+    {
+        Move(Vector2Int.down);
+    }
+
     public int Clamp(int min, int max, int num)
     {
-        if (num > max)
-        {
-            return min;
-        }
-
         if (num < min)
         {
-            return max;
+            return max - (min - num) % (max - min);
         }
-
-        return num;
+        else
+        {
+            return min + (num - min) % (max - min);
+        }
     }
 
 

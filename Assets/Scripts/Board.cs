@@ -3,16 +3,17 @@ using UnityEngine.Tilemaps;
 
 public class Board : MonoBehaviour
 {
-    public TetrominoData[] tetrominoes;
     public Tilemap tilemap { get; private set; }
-
     public Piece activePiece { get; private set; }
+
+    public TetrominoData[] tetrominoes;
+    public Vector2Int boardSize = new Vector2Int(10, 20);
     public Vector3Int spawnPosition = new Vector3Int(-1, 8, 0);
+
     public RectInt Bounds
     {
         get
         {
-            Vector2Int boardSize = new Vector2Int(10, 20);
             Vector2Int position = new Vector2Int(-boardSize.x / 2, -boardSize.y / 2);
             return new RectInt(position, boardSize);
         }
@@ -65,7 +66,7 @@ public class Board : MonoBehaviour
     public bool IsValidPosition(Piece piece, Vector3Int position)
     {
         RectInt bounds = Bounds;
-
+        Debug.Log("x:" + position.x + "y:" + position.y);
         // The position is only valid if every cell is valid
         for (int i = 0; i < piece.cells.Length; i++)
         {
