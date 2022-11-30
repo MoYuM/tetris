@@ -6,14 +6,22 @@ public class Piece : MonoBehaviour
     public TetrominoData data { get; private set; }
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
-    private int rotationIndex = 0;
+
     public float stepDelayTime = 1.0f;
+    public float lockDelayTime = 0.5f;
+
+    private int rotationIndex = 0;
+    private float localStepDelayTime;
+    private float localLockDelayTime;
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
         this.board = board;
         this.position = position;
         this.data = data;
+
+        localStepDelayTime = stepDelayTime;
+        localLockDelayTime = lockDelayTime;
 
         if (cells == null)
         {
@@ -62,11 +70,11 @@ public class Piece : MonoBehaviour
             hardDrop();
         }
 
-        stepDelayTime -= Time.deltaTime;
-        if (stepDelayTime < 0)
+        localStepDelayTime -= Time.deltaTime;
+        localLockDelayTime -= Time.deltaTime;
+        if (localStepDelayTime < 0)
         {
-            Step();
-            stepDelayTime = 2f;
+          Step();
 	    }
 
         board.Set(this);
@@ -162,6 +170,17 @@ public class Piece : MonoBehaviour
     public void Step()
     {
         Move(Vector2Int.down);
+
+        if (localLockDelayTime < 0)
+        {
+            Lock();
+	    }
+    }
+
+    public void Lock()
+    {
+        board.Set(this);
+        board.SpawnPiece();
     }
 
     public int Clamp(int min, int max, int num)
@@ -188,6 +207,8 @@ public class Piece : MonoBehaviour
         if (isValid)
         {
             this.position = newPosition;
+            this.localStepDelayTime = stepDelayTime;
+            this.localLockDelayTime = lockDelayTime;
         }
 
         return isValid;

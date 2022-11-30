@@ -48,7 +48,6 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < piece.cells.Length; i++)
         {
-            
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, piece.data.tile);
         }
@@ -66,7 +65,6 @@ public class Board : MonoBehaviour
     public bool IsValidPosition(Piece piece, Vector3Int position)
     {
         RectInt bounds = Bounds;
-        Debug.Log("x:" + position.x + "y:" + position.y);
         // The position is only valid if every cell is valid
         for (int i = 0; i < piece.cells.Length; i++)
         {
