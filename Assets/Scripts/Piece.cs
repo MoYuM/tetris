@@ -180,6 +180,7 @@ public class Piece : MonoBehaviour
     public void Lock()
     {
         board.Set(this);
+        board.ClearLines();
         board.SpawnPiece();
     }
 
@@ -220,6 +221,8 @@ public class Piece : MonoBehaviour
         {
             continue;
         }
+
+        Lock();
     }
 
 }

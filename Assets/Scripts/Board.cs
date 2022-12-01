@@ -62,6 +62,67 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void ClearLines()
+    {
+        RectInt bounds = Bounds;
+        int row = bounds.yMin;
+
+        while(row < bounds.yMax)
+        { 
+            if (isFullRow(row))
+            {
+                ClearLine(row);        
+	        } 
+	        else
+            {
+                row++;
+	        }
+	    }
+    }
+
+    public void ClearLine(int row)
+    {
+        RectInt bounds = Bounds;
+        int _row = row;
+
+        for(int col = bounds.xMin; col < bounds.xMax; col ++)
+        {
+            Vector3Int position = new Vector3Int(col, row, 0);
+            tilemap.SetTile(position, null);
+	    }
+
+        while(_row < bounds.yMax)
+        { 
+            for(int col = bounds.xMin; col < bounds.xMax; col ++)
+            {
+                Vector3Int position = new Vector3Int(col, _row + 1, 0);
+                TileBase aboveTile = tilemap.GetTile(position);
+
+                position = new Vector3Int(col, _row, 0);
+                tilemap.SetTile(position, aboveTile);
+	        }
+
+            _row++;
+	    }
+    }
+
+    public bool isFullRow(int row)
+    {
+        RectInt bounds = Bounds;
+
+        for(int i = bounds.xMin; i < bounds.xMax; i ++)
+        {
+            Vector3Int position = new Vector3Int(i, row, 0);
+
+            if (!tilemap.HasTile(position))
+            {
+                return false;
+	        }
+	    }
+
+        return true;
+    }
+
     public bool IsValidPosition(Piece piece, Vector3Int position)
     {
         RectInt bounds = Bounds;
