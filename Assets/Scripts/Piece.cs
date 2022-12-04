@@ -7,12 +7,15 @@ public class Piece : MonoBehaviour
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
 
-    public float stepDelayTime = 1.0f;
-    public float lockDelayTime = 0.5f;
-
     private int rotationIndex = 0;
-    private float localStepDelayTime;
-    private float localLockDelayTime;
+
+    public float stepDelay = 0.5f;
+    //public float moveDelay = 0.1f;
+    public float lockDelay = 0.5f;
+
+    private float stepTime;
+    //private float moveTime;
+    private float lockTime;
 
     public void Initialize(Board board, Vector3Int position, TetrominoData data)
     {
@@ -20,8 +23,7 @@ public class Piece : MonoBehaviour
         this.position = position;
         this.data = data;
 
-        localStepDelayTime = stepDelayTime;
-        localLockDelayTime = lockDelayTime;
+        stepTime = Time.time + stepDelay;
 
         if (cells == null)
         {
@@ -39,6 +41,8 @@ public class Piece : MonoBehaviour
     {
 
         board.Clear(this);
+        
+        lockTime += Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -70,9 +74,7 @@ public class Piece : MonoBehaviour
             hardDrop();
         }
 
-        localStepDelayTime -= Time.deltaTime;
-        localLockDelayTime -= Time.deltaTime;
-        if (localStepDelayTime < 0)
+        if (Time.time > stepTime)
         {
           Step();
 	    }
@@ -169,12 +171,14 @@ public class Piece : MonoBehaviour
 
     public void Step()
     {
+        stepTime = Time.time + stepDelay;
+
         Move(Vector2Int.down);
 
-        if (localLockDelayTime < 0)
+        if (lockTime > lockDelay)
         {
             Lock();
-	    }
+        }
     }
 
     public void Lock()
@@ -183,7 +187,7 @@ public class Piece : MonoBehaviour
         board.ClearLines();
         board.SpawnPiece();
     }
-
+      
     public int Clamp(int min, int max, int num)
     {
         if (num < min)
@@ -208,8 +212,7 @@ public class Piece : MonoBehaviour
         if (isValid)
         {
             this.position = newPosition;
-            this.localStepDelayTime = stepDelayTime;
-            this.localLockDelayTime = lockDelayTime;
+            lockTime = 0f;
         }
 
         return isValid;
